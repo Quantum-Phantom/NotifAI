@@ -12,6 +12,7 @@ import { useSnackbar } from '../composables/useSnackbar'
 import { copyText } from '../utils/share'
 import { DataValidationError, normalizeHttpUrl } from '../utils/validation'
 import { sanitizeNoticeContent } from '../utils/sanitizeNoticeContent'
+import { getAttachmentIcon } from '../utils/attachmentIcon'
 import { readNoticeDetailCache, writeNoticeDetailCache } from '../utils/noticeFeedCache'
 import AppBanner from '../components/AppBanner.vue'
 
@@ -348,7 +349,7 @@ function handleContentKeydown(event: KeyboardEvent): void {
                 v-for="(att, idx) in notice.attachments"
                 :key="idx"
                 :title="att.name"
-                prepend-icon="$fileDownload"
+                :prepend-icon="getAttachmentIcon(att.name, att.url)"
                 @click="copyAttachmentUrl(att.url)"
               >
                 <template #append>

@@ -270,4 +270,37 @@ describe('Detail request lifecycle', () => {
     expect(wrapper.text()).toContain('考试安排')
     expect(wrapper.text()).toContain('教学安排')
   })
+
+  it('renders a file-type icon for each attachment', async () => {
+    const loadedNotice = createNotice('notice-1')
+    loadedNotice.attachments = [
+      { name: '成绩单.xlsx', url: 'https://www.ustc.edu.cn/files/score.xlsx' },
+      { name: '通知.pdf', url: 'https://www.ustc.edu.cn/files/notice.pdf' },
+      { name: '附件', url: 'https://www.ustc.edu.cn/files/archive.rar' },
+      { name: '未知', url: 'https://www.ustc.edu.cn/download?id=1' },
+    ]
+    mocks.fetchNoticeById.mockResolvedValue(loadedNotice)
+
+    const router = createTestRouter()
+    await router.push('/detail/notice-1')
+    const wrapper = shallowMount(Detail, {
+      global: {
+        plugins: [router],
+        stubs: {
+          ...componentStubs,
+          VListItem: {
+            props: ['prependIcon', 'title'],
+            template: '<div :data-icon="prependIcon" :data-title="title"><slot /></div>',
+          },
+        },
+      },
+    })
+    wrappers.push(wrapper)
+    await flushPromises()
+
+    const attachmentIcons = wrapper
+      .findAll('[data-title]')
+      .map((item) => item.attributes('data-icon'))
+    expect(attachmentIcons).toEqual(['$fileExcel', '$filePdf', '$folderZip', '$fileDownload'])
+  })
 })
